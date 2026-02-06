@@ -14,6 +14,8 @@ MVVM + Clean Architecture + Atomic Design パターンに従ったコード生�
 
 ### インストール
 
+#### Claude Code
+
 ```bash
 # 1. マーケットプレイスを追加
 claude plugin marketplace add https://github.com/Next2D/skills
@@ -21,6 +23,22 @@ claude plugin marketplace add https://github.com/Next2D/skills
 # 2. プラグインをインストール
 claude plugin install next2d-development-assistant
 ```
+
+#### Codex (OpenAI)
+
+```bash
+# 0. Codex CLI をインストール（未導入の場合）
+npm i -g @openai/codex
+
+# 1. このリポジトリ直下でスキルを登録
+mkdir -p .agents/skills
+ln -s ../../skills/next2d .agents/skills/next2d
+
+# 2. Codex を起動（このディレクトリから）
+codex
+```
+
+※ シンボリックリンクではなくコピーする場合は `cp -R skills/next2d .agents/skills/next2d` を使用してください。
 
 ### スペックソース
 
@@ -42,6 +60,8 @@ Provides code generation following MVVM + Clean Architecture + Atomic Design pat
 
 ### Installation
 
+#### Claude Code
+
 ```bash
 # 1. Add the marketplace
 claude plugin marketplace add https://github.com/Next2D/skills
@@ -49,3 +69,19 @@ claude plugin marketplace add https://github.com/Next2D/skills
 # 2. Install the plugin
 claude plugin install next2d-development-assistant
 ```
+
+#### Codex (OpenAI)
+
+```bash
+# 0. Install the Codex CLI (if needed)
+npm i -g @openai/codex
+
+# 1. Register the skill from the repo root
+mkdir -p .agents/skills
+ln -s ../../skills/next2d .agents/skills/next2d
+
+# 2. Launch Codex from this directory
+codex
+```
+
+If you prefer copying instead of symlinking, use `cp -R skills/next2d .agents/skills/next2d`.
