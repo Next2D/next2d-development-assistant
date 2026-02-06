@@ -2,17 +2,17 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
+1. [Overview](#next2d-player)
 2. [DisplayObject](#displayobject)
-3. [Events](#events)
+3. [Events](#イベントシステム)
 4. [MovieClip](#movieclip)
 5. [Shape](#shape)
-6. [Sound](#sound)
+6. [Sound](#サウンド)
 7. [Sprite](#sprite)
 8. [TextField](#textfield)
-9. [Tween](#tween)
+9. [Tween](#tweenアニメーション)
 10. [Video](#video)
-11. [Filters](#filters)
+11. [Filters](#フィルター)
 
 ---
 
