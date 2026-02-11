@@ -903,6 +903,50 @@ ui/
 
 ---
 
+## DisplayObject 配置の基本方針（中心基準点パターン）
+
+Next2D の座標系は画面左上 (0, 0) が基準点。Shape や Sprite をそのまま配置すると、スケールや回転アニメーション時に座標がずれる。
+**基本方針として、子要素を親 Sprite に中心配置する。**
+
+### パターン: Shape を Sprite に中心配置
+
+```typescript
+const sprite = new Sprite();
+const shape  = new Shape();
+
+// 画像の場合、Retina対応でスケールを設定
+shape.scaleX = shape.scaleY = 0.5;
+
+// スケール設定後に中心配置
+shape.x = -shape.width  / 2;
+shape.y = -shape.height / 2;
+
+sprite.addChild(shape);
+```
+
+### パターン: Sprite を Sprite に中心配置
+
+```typescript
+const parent = new Sprite();
+const child  = new Sprite();
+
+// 子要素のサイズ確定後に中心配置
+child.x = -child.width  / 2;
+child.y = -child.height / 2;
+
+parent.addChild(child);
+```
+
+### なぜ中心配置が必要か
+
+- スケール・回転は DisplayObject の (0, 0) を基点に実行される
+- 中心配置しないと、回転・拡縮時に意図しない位置ずれが発生する
+- 中心配置により、親 Sprite の (x, y) がそのまま表示上の中心座標になる
+
+**注意:** すべてのケースで必須ではないが、アニメーション対象の要素には基本的にこのパターンを適用する。
+
+---
+
 ## Atomic Design Hierarchy
 
 ### Atom (原子) - 最小単位
