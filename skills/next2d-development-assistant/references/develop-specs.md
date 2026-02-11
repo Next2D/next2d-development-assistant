@@ -954,7 +954,7 @@ parent.addChild(child);
 最も基本的なUI要素。これ以上分割できない。
 
 ```typescript
-// ButtonAtom: ボタンの基本機能
+// ButtonAtom: ボタンの基本機能 (enable/disable による連続押下防止機能付き)
 import { Sprite } from "@next2d/display";
 
 export class ButtonAtom extends Sprite
@@ -963,6 +963,34 @@ export class ButtonAtom extends Sprite
     {
         super();
         this.buttonMode = true;
+    }
+
+    /**
+     * @description ボタンを有効化する
+     *              Enable button
+     *
+     * @return {void}
+     * @method
+     * @public
+     */
+    enable (): void
+    {
+        this.mouseEnabled  = true;
+        this.mouseChildren = true;
+    }
+
+    /**
+     * @description ボタンを無効化する
+     *              Disable button
+     *
+     * @return {void}
+     * @method
+     * @public
+     */
+    disable (): void
+    {
+        this.mouseEnabled  = false;
+        this.mouseChildren = false;
     }
 }
 ```
@@ -985,6 +1013,86 @@ export class TextAtom extends TextField implements ITextField
     }
 }
 ```
+
+### ボタン連続押下防止パターン
+
+ボタン押下後に処理が完了するまで連続押下を防止したい場合に使えるパターン。`ButtonAtom` の `disable()` / `enable()` を利用して `mouseEnabled` と `mouseChildren` を制御する。
+
+連続押下を防止するかどうかはユースケースに応じて判断する。画面遷移やAPI通信など多重実行を避けたい処理では有効。
+
+#### View でのイベント登録パターン
+
+```typescript
+// View: ボタン押下時にViewModelのハンドラを呼び出す
+async initialize (): Promise<void>
+{
+    const btn = new YourBtnMolecule();
+    btn.addEventListener(PointerEvent.POINTER_DOWN, (event) => {
+        this.vm.handleButtonTap(event);
+    });
+    this.addChild(btn);
+}
+```
+
+#### ViewModel での連続押下防止パターン
+
+```typescript
+// ViewModel: disable → 処理 → enable で連続押下を防止
+handleButtonTap (event: PointerEvent): void
+{
+    // ボタンを即座に無効化して連続押下を防止
+    const button = event.currentTarget as unknown as ButtonAtom;
+    button.disable();
+
+    // 処理実行 (画面遷移、API呼び出し、アニメーション等)
+    this.someUseCase.execute();
+
+    // 処理完了後にボタンを再有効化 (画面遷移の場合は不要)
+    button.enable();
+}
+```
+
+#### 非同期処理での連続押下防止パターン
+
+```typescript
+// ViewModel: 非同期処理の完了を待ってから再有効化
+async handleButtonTap (event: PointerEvent): Promise<void>
+{
+    const button = event.currentTarget as unknown as ButtonAtom;
+    button.disable();
+
+    try {
+        await this.fetchDataUseCase.execute();
+    } finally {
+        // エラー時も必ず再有効化
+        button.enable();
+    }
+}
+```
+
+#### アニメーション完了後に再有効化するパターン
+
+```typescript
+// ViewModel: アニメーション完了コールバックで再有効化
+handleButtonTap (event: PointerEvent): void
+{
+    const button = event.currentTarget as unknown as ButtonAtom;
+    button.disable();
+
+    new SomeAnimation(button, () => {
+        // アニメーション完了後に再有効化
+        button.enable();
+    }).start();
+}
+```
+
+#### 連続押下を許可するケース
+
+以下のケースでは `disable()` / `enable()` を使わず、連続押下を許可する:
+
+- **インクリメント/デクリメントボタン**: 数量の増減など、連打を前提とした操作
+- **連射系ゲーム操作**: 連続タップがゲームメカニクスの一部である場合
+- **トグルボタン**: ON/OFF を素早く切り替える必要がある場合
 
 ### Molecule (分子) - Atomの組み合わせ
 

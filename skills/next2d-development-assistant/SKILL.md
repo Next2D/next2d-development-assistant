@@ -129,5 +129,6 @@ Detailed specifications are available in the `references/` directory. Read the r
 | プロジェクト構造・ディレクトリ設計 | develop-specs.md |
 | UseCase / Repository の作成 | develop-specs.md |
 | Atomic Design コンポーネントの作成 | develop-specs.md |
+| ボタン連続押下防止パターン | develop-specs.md |
 | Interface の定義パターン | develop-specs.md |
 | テストの書き方 (Vitest) | develop-specs.md |
