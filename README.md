@@ -2,7 +2,7 @@
 
 ## 日本語
 
-Next2D Framework および Next2D Player を用いた開発を強力にサポートするAI Skillです。
+Next2D Framework および Next2D Player を用いた開発をサポートするAI Skillです。
 MVVM + Clean Architecture + Atomic Design パターンに従ったコード生成、WebGLレンダリングの最適化、直感的なアニメーション実装を支援します。
 
 - **TypeScript First**: Next2D特有のクラス構造やAPIに完全対応
@@ -48,8 +48,8 @@ codex
 
 ## English
 
-AI Skill that powerfully supports development using the Next2D Framework and Next2D Player.
-Provides code generation following MVVM + Clean Architecture + Atomic Design patterns, WebGL rendering optimization, and intuitive animation implementation support.
+This AI Skill supports development using the Next2D Framework and Next2D Player.
+It assists with code generation following the MVVM + Clean Architecture + Atomic Design patterns, optimizes WebGL rendering, and enables intuitive animation implementation.
 
 - **TypeScript First**: Fully compatible with Next2D's unique class structure and APIs
 - **MVVM + Clean Architecture**: Design support for View/ViewModel, UseCase, Repository patterns
