@@ -1,10 +1,10 @@
 {
-  "name": "next2d-skills",
+  "name": "next2d-development-assistant",
   "version": "1.0.0",
-  "description": "Next2D development assistant skills",
+  "description": "This Skill supports development using the Next2D Framework and Next2D Player.",
   "owner": {
     "name": "Next2D",
-    "email": ""
+    "email": "ienaga@next2d.app"
   },
   "plugins": [
     {
@@ -12,7 +12,7 @@
       "description": "Next2D Player and Framework development assistant for TypeScript-based MVVM + Clean Architecture + Atomic Design applications",
       "source": "./",
       "skills": [
-        "./skills/next2d"
+        "./skills/next2d-development-assistant"
       ]
     }
   ]

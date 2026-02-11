@@ -32,7 +32,7 @@ npm i -g @openai/codex
 
 # 1. このリポジトリ直下でスキルを登録
 mkdir -p .agents/skills
-ln -s ../../skills/next2d .agents/skills/next2d
+ln -s ../../skills/next2d-development-assistant .agents/skills/next2d-development-assistant
 
 # 2. Codex を起動（このディレクトリから）
 codex
@@ -78,7 +78,7 @@ npm i -g @openai/codex
 
 # 1. Register the skill from the repo root
 mkdir -p .agents/skills
-ln -s ../../skills/next2d .agents/skills/next2d
+ln -s ../../skills/next2d-development-assistant .agents/skills/next2d-development-assistant
 
 # 2. Launch Codex from this directory
 codex
