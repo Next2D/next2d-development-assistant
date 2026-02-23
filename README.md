@@ -1,5 +1,7 @@
 # Next2D AI SKILL
 
+[![release](https://img.shields.io/github/v/release/Next2D/next2d-development-assistant)](https://github.com/Next2D/next2d-development-assistant/releases)
+
 ## 日本語
 
 Next2D Framework および Next2D Player を用いた開発をサポートするAI Skillです。
