@@ -91,6 +91,7 @@ ViewModel 生成 → ViewModel.initialize() → View 生成 (VM注入) → View.
 - **Repository:** try-catch 必須。エンドポイントは `config` から取得。`any` 禁止
 - **UI Component:** 単一責任。データは ViewModel から引数で受け取る
 - **Interface:** `I` プレフィックス。必要最小限のプロパティのみ
+- **動作検証:** 画面遷移や UI 挙動の変更後は、`npx playwright` によるE2E動作確認を推奨（例: `npx playwright test`）
 
 ## Build Commands
 

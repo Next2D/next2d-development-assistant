@@ -1,17 +1,16 @@
-# Next2D Framework TypeScript Template - Development Specs
+# Next2D Framework TypeScript Template - 開発仕様
 
-## Table of Contents
+## 目次
 
-1. [Overview](#next2d-framework-typescript-template---overview)
-2. [CLI Commands Reference](#cli-commands-reference)
-3. [Configuration Files](#configuration-files)
-4. [Interface Definitions](#interface-definitions)
-5. [Model Layer (Application / Domain / Infrastructure)](#model-layer-application--domain--infrastructure)
-6. [UI Layer (Components / Animation / Content)](#ui-layer-components--animation--content)
-7. [View / ViewModel (MVVM Pattern)](#view--viewmodel-mvvm-pattern)
+1. [概要](#next2d-framework-typescript-template---overview)
+2. [CLIコマンドリファレンス](#cli-commands-reference)
+3. [設定ファイル](#configuration-files)
+4. [インターフェース定義](#interface-definitions)
+5. [Modelレイヤー (Application / Domain / Infrastructure)](#model-layer-application--domain--infrastructure)
+6. [UIレイヤー (Components / Animation / Content)](#ui-layer-components--animation--content)
+7. [View / ViewModel (MVVMパターン)](#view--viewmodel-mvvm-pattern)
 
 ---
-
 # Next2D Framework TypeScript Template - Overview
 
 ## Project Summary
@@ -903,50 +902,6 @@ ui/
 
 ---
 
-## DisplayObject 配置の基本方針（中心基準点パターン）
-
-Next2D の座標系は画面左上 (0, 0) が基準点。Shape や Sprite をそのまま配置すると、スケールや回転アニメーション時に座標がずれる。
-**基本方針として、子要素を親 Sprite に中心配置する。**
-
-### パターン: Shape を Sprite に中心配置
-
-```typescript
-const sprite = new Sprite();
-const shape  = new Shape();
-
-// 画像の場合、Retina対応でスケールを設定
-shape.scaleX = shape.scaleY = 0.5;
-
-// スケール設定後に中心配置
-shape.x = -shape.width  / 2;
-shape.y = -shape.height / 2;
-
-sprite.addChild(shape);
-```
-
-### パターン: Sprite を Sprite に中心配置
-
-```typescript
-const parent = new Sprite();
-const child  = new Sprite();
-
-// 子要素のサイズ確定後に中心配置
-child.x = -child.width  / 2;
-child.y = -child.height / 2;
-
-parent.addChild(child);
-```
-
-### なぜ中心配置が必要か
-
-- スケール・回転は DisplayObject の (0, 0) を基点に実行される
-- 中心配置しないと、回転・拡縮時に意図しない位置ずれが発生する
-- 中心配置により、親 Sprite の (x, y) がそのまま表示上の中心座標になる
-
-**注意:** すべてのケースで必須ではないが、アニメーション対象の要素には基本的にこのパターンを適用する。
-
----
-
 ## Atomic Design Hierarchy
 
 ### Atom (原子) - 最小単位
@@ -954,7 +909,7 @@ parent.addChild(child);
 最も基本的なUI要素。これ以上分割できない。
 
 ```typescript
-// ButtonAtom: ボタンの基本機能 (enable/disable による連続押下防止機能付き)
+// ButtonAtom: ボタンの基本機能
 import { Sprite } from "@next2d/display";
 
 export class ButtonAtom extends Sprite
@@ -963,34 +918,6 @@ export class ButtonAtom extends Sprite
     {
         super();
         this.buttonMode = true;
-    }
-
-    /**
-     * @description ボタンを有効化する
-     *              Enable button
-     *
-     * @return {void}
-     * @method
-     * @public
-     */
-    enable (): void
-    {
-        this.mouseEnabled  = true;
-        this.mouseChildren = true;
-    }
-
-    /**
-     * @description ボタンを無効化する
-     *              Disable button
-     *
-     * @return {void}
-     * @method
-     * @public
-     */
-    disable (): void
-    {
-        this.mouseEnabled  = false;
-        this.mouseChildren = false;
     }
 }
 ```
@@ -1013,86 +940,6 @@ export class TextAtom extends TextField implements ITextField
     }
 }
 ```
-
-### ボタン連続押下防止パターン
-
-ボタン押下後に処理が完了するまで連続押下を防止したい場合に使えるパターン。`ButtonAtom` の `disable()` / `enable()` を利用して `mouseEnabled` と `mouseChildren` を制御する。
-
-連続押下を防止するかどうかはユースケースに応じて判断する。画面遷移やAPI通信など多重実行を避けたい処理では有効。
-
-#### View でのイベント登録パターン
-
-```typescript
-// View: ボタン押下時にViewModelのハンドラを呼び出す
-async initialize (): Promise<void>
-{
-    const btn = new YourBtnMolecule();
-    btn.addEventListener(PointerEvent.POINTER_DOWN, (event) => {
-        this.vm.handleButtonTap(event);
-    });
-    this.addChild(btn);
-}
-```
-
-#### ViewModel での連続押下防止パターン
-
-```typescript
-// ViewModel: disable → 処理 → enable で連続押下を防止
-handleButtonTap (event: PointerEvent): void
-{
-    // ボタンを即座に無効化して連続押下を防止
-    const button = event.currentTarget as unknown as ButtonAtom;
-    button.disable();
-
-    // 処理実行 (画面遷移、API呼び出し、アニメーション等)
-    this.someUseCase.execute();
-
-    // 処理完了後にボタンを再有効化 (画面遷移の場合は不要)
-    button.enable();
-}
-```
-
-#### 非同期処理での連続押下防止パターン
-
-```typescript
-// ViewModel: 非同期処理の完了を待ってから再有効化
-async handleButtonTap (event: PointerEvent): Promise<void>
-{
-    const button = event.currentTarget as unknown as ButtonAtom;
-    button.disable();
-
-    try {
-        await this.fetchDataUseCase.execute();
-    } finally {
-        // エラー時も必ず再有効化
-        button.enable();
-    }
-}
-```
-
-#### アニメーション完了後に再有効化するパターン
-
-```typescript
-// ViewModel: アニメーション完了コールバックで再有効化
-handleButtonTap (event: PointerEvent): void
-{
-    const button = event.currentTarget as unknown as ButtonAtom;
-    button.disable();
-
-    new SomeAnimation(button, () => {
-        // アニメーション完了後に再有効化
-        button.enable();
-    }).start();
-}
-```
-
-#### 連続押下を許可するケース
-
-以下のケースでは `disable()` / `enable()` を使わず、連続押下を許可する:
-
-- **インクリメント/デクリメントボタン**: 数量の増減など、連打を前提とした操作
-- **連射系ゲーム操作**: 連続タップがゲームメカニクスの一部である場合
-- **トグルボタン**: ON/OFF を素早く切り替える必要がある場合
 
 ### Molecule (分子) - Atomの組み合わせ
 
@@ -1574,3 +1421,4 @@ homeContentPointerDownEvent(event: PointerEvent): void {
     this.startDragUseCase.execute(target);
 }
 ```
+
