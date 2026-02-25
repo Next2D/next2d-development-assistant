@@ -1033,6 +1033,154 @@ export class YourMolecule extends ButtonAtom
 }
 ```
 
+## Button Enable/Disable Pattern (連打防止)
+
+`ButtonAtom` は `enable()` / `disable()` メソッドを持ち、ボタンの連続タップを防止できる。
+
+### ButtonAtom の enable/disable API
+
+```typescript
+// src/ui/component/atom/ButtonAtom.ts
+export class ButtonAtom extends Sprite {
+    constructor() {
+        super();
+        this.buttonMode = true;
+    }
+
+    // ボタンを有効化 (mouseEnabled/mouseChildren = true)
+    enable(): void {
+        this.mouseEnabled  = true;
+        this.mouseChildren = true;
+    }
+
+    // ボタンを無効化 (mouseEnabled/mouseChildren = false)
+    disable(): void {
+        this.mouseEnabled  = false;
+        this.mouseChildren = false;
+    }
+}
+```
+
+### パターン1: 通常ボタン (PointerEvent.POINTER_UP で再有効化)
+
+ボタン押下時に `disable()` し、`POINTER_UP` のタイミングで `enable()` を呼ぶ。
+
+```typescript
+import { ButtonAtom } from "../atom/ButtonAtom";
+import { PointerEvent } from "@next2d/events";
+
+export class YourBtnMolecule extends ButtonAtom {
+    onPointerDown(): void {
+        this.disable(); // 押下時に無効化して連打防止
+        // ... 処理
+    }
+
+    onPointerUp(): void {
+        // ... 処理
+        this.enable(); // POINTER_UP 時に再有効化
+    }
+}
+
+// View でのイベント登録例
+btn.addEventListener(PointerEvent.POINTER_DOWN, () => btn.onPointerDown());
+btn.addEventListener(PointerEvent.POINTER_UP,   () => btn.onPointerUp());
+```
+
+### パターン2: Tween アニメーションあり (Job の COMPLETE イベントで再有効化)
+
+アニメーション完了まで操作不可にする場合は、`Job` の `Event.COMPLETE` で `enable()` を呼ぶ。
+
+```typescript
+import { ButtonAtom } from "../atom/ButtonAtom";
+import { Tween, Easing, type Job } from "@next2d/ui";
+import { Event } from "@next2d/events";
+
+export class YourBtnMolecule extends ButtonAtom {
+    onPointerUp(): Promise<void> {
+        this.disable(); // アニメーション開始前に無効化
+        return new Promise<void>((resolve) => {
+            new YourBtnPointerUpAnimation(this, resolve).start();
+            // アニメーション側の Job.COMPLETE で enable() を呼ぶ
+        });
+    }
+}
+
+// Animation クラス側での実装例
+export class YourBtnPointerUpAnimation {
+    private readonly _job: Job;
+
+    constructor(sprite: Sprite, callback?: () => void) {
+        this._job = Tween.add(sprite,
+            { "scaleX": 1.0, "scaleY": 1.0 },
+            { "scaleX": 0.9, "scaleY": 0.9 },
+            0.2, 0, Easing.outQuad
+        );
+
+        this._job.addEventListener(Event.COMPLETE, () => {
+            (sprite as unknown as ButtonAtom).enable(); // アニメーション完了時に有効化
+            if (callback) callback();
+        });
+    }
+
+    start(): void { this._job.start(); }
+}
+```
+
+### 実装例 (NormalPlayBtnMolecule より)
+
+```typescript
+// src/ui/component/molecule/NormalPlayBtnMolecule.ts
+export class NormalPlayBtnMolecule extends ButtonAtom {
+    onPointerDown(): void {
+        new HomeNormalPlayBtnPointerDownAnimation(this).start();
+    }
+
+    onPointerUp(): Promise<void> {
+        this.disable(); // 押下時に無効化
+        return new Promise<void>((resolve) => {
+            // アニメーション完了時に resolve → 呼び出し側でチェーン処理
+            new HomeNormalPlayBtnPointerUpAnimation(this, resolve).start();
+            // Animation の Job.COMPLETE 内で enable() を呼ぶ
+        });
+    }
+}
+```
+
+### 判断基準
+
+| ケース | `enable()` のタイミング |
+|--------|----------------------|
+| 通常ボタン（アニメーションなし） | `PointerEvent.POINTER_UP` |
+| Tween アニメーションあり | `Job` の `Event.COMPLETE` |
+| 非同期処理後に有効化したい | `Promise` の `resolve` 後または `await` 後 |
+
+### Anti-Patterns
+
+```typescript
+// NG: disable のみで enable し忘れる → ボタンが永遠に操作不可になる
+onPointerDown(): void {
+    this.disable();
+    // enable() の呼び忘れ
+}
+
+// NG: アニメーション完了前に enable() を呼ぶ → 連打防止が無効
+onPointerUp(): void {
+    this.disable();
+    new SomeAnimation(this).start();
+    this.enable(); // NG: アニメーション開始直後に有効化してしまう
+}
+
+// OK: Job の COMPLETE イベント内で enable()
+constructor(sprite: Sprite) {
+    this._job = Tween.add(sprite, { alpha: 0 }, { alpha: 1 }, 0.3);
+    this._job.addEventListener(Event.COMPLETE, () => {
+        (sprite as unknown as ButtonAtom).enable(); // OK
+    });
+}
+```
+
+---
+
 ## Anti-Patterns
 
 ```typescript

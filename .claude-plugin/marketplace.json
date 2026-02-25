@@ -9,7 +9,7 @@
     {
       "name": "next2d-development-assistant",
       "description": "Next2D Player and Framework development assistant for TypeScript-based MVVM + Clean Architecture + Atomic Design applications",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "author": {
         "name": "Next2D",
         "email": "ienaga@next2d.app"

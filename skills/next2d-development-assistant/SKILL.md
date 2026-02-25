@@ -13,10 +13,12 @@ description: >
   (5) Animation Tool (.n2d) アセットとの連携
   (6) マルチプラットフォームビルド (Web/Steam/iOS/Android)
   (7) Next2D プロジェクトの新規作成やセットアップ
+  (8) ButtonAtom の enable/disable によるボタン連打防止パターンの実装
 
   Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, @next2d/display,
   @next2d/events, @next2d/text, @next2d/media, @next2d/ui, MovieClipContent,
-  gotoView, routing.json, stage.json, create-next2d-app
+  gotoView, routing.json, stage.json, create-next2d-app,
+  ButtonAtom, enable, disable, 連打防止, ボタン無効化
 ---
 
 # Next2D Development Assistant
@@ -49,7 +51,6 @@ npx create-next2d-app my-app
 cd my-app
 npm install
 npm start           # http://localhost:5173
-npm run generate    # routing.json から View/ViewModel を自動生成
 ```
 
 ## Core Workflow
