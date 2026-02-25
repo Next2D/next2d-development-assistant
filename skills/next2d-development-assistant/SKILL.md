@@ -95,6 +95,26 @@ ViewModel 生成 → ViewModel.initialize() → View 生成 (VM注入) → View.
 - **動作検証:** 画面遷移や UI 挙動の変更後は、`npx playwright` によるE2E動作確認を推奨（例: `npx playwright test`）
 - **CSP設定:** `default-src 'self' data: blob:` / `worker-src 'self' blob: data:` / `style-src 'self' 'unsafe-inline'` が必須。`frame-ancestors 'none'` は追加禁止
 
+## Display Object Hierarchy
+
+Next2D の表示オブジェクトの継承関係。型キャストや子オブジェクト管理で誤りやすいため注意：
+
+```
+DisplayObject (基底クラス)
+├── InteractiveObject
+│   ├── DisplayObjectContainer
+│   │   └── Sprite
+│   │       └── MovieClip    ← addChild() 可能、タイムラインアニメーション
+│   └── TextField            ← addChild() 不可、テキスト表示/入力
+├── Shape                    ← addChild() 不可、軽量ベクター描画専用
+└── Video                    ← addChild() 不可、動画再生専用
+```
+
+**重要な型制約:**
+- `Shape` は `DisplayObjectContainer` を継承しない → `addChild()` 不可、子オブジェクト管理不可
+- `Shape` と `Sprite` は直接キャスト不可（`Conversion of type 'Shape' to type 'Sprite'` エラー）→ `as unknown as Sprite` の二段階アサーションが必要
+- `hitArea` プロパティの型は `Sprite | null` → `Shape` を `hitArea` に渡す場合は型アサーション必須
+
 ## Build Commands
 
 | Command | Platform | Output |
