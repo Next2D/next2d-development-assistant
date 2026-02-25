@@ -93,6 +93,7 @@ ViewModel 生成 → ViewModel.initialize() → View 生成 (VM注入) → View.
 - **UI Component:** 単一責任。データは ViewModel から引数で受け取る
 - **Interface:** `I` プレフィックス。必要最小限のプロパティのみ
 - **動作検証:** 画面遷移や UI 挙動の変更後は、`npx playwright` によるE2E動作確認を推奨（例: `npx playwright test`）
+- **CSP設定:** `default-src 'self' data: blob:` / `worker-src 'self' blob: data:` / `style-src 'self' 'unsafe-inline'` が必須。`frame-ancestors 'none'` は追加禁止
 
 ## Build Commands
 
@@ -134,3 +135,4 @@ Detailed specifications are available in the `references/` directory. Read the r
 | ボタン連続押下防止パターン | develop-specs.md |
 | Interface の定義パターン | develop-specs.md |
 | テストの書き方 (Vitest) | develop-specs.md |
+| Content-Security-Policy (CSP) の設定 | develop-specs.md |

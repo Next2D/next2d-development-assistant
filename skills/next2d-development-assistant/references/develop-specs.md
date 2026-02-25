@@ -1544,6 +1544,85 @@ npm run generate
 
 `routing.json`のトッププロパティ値を分解し、`view`ディレクトリ直下に対象ディレクトリがなければ作成。View/ViewModelが存在しない場合のみ新規クラスを生成。
 
+---
+
+# Security Configuration
+
+## Content-Security-Policy (CSP) 設定時の注意事項
+
+Next2D Player は WebGL/WebGPU による描画、Web Worker、Blob URL を内部で使用するため、CSP の設定には制約がある。
+誤った設定を行うとアプリが動作しなくなる。
+
+### 必須ディレクティブ
+
+```
+Content-Security-Policy:
+  default-src 'self' data: blob:;
+  script-src 'self';
+  style-src 'self' 'unsafe-inline';
+  connect-src 'self' https://{{ドメイン}};
+  worker-src 'self' blob: data:;
+```
+
+| ディレクティブ | 必要な値 | 理由 |
+|------------|---------|------|
+| `default-src` | `'self' data: blob:` | Blob URL・Data URI を Player 内部で使用するため |
+| `script-src` | `'self'` | インラインスクリプト不要。`'unsafe-inline'` は不要 |
+| `style-src` | `'self' 'unsafe-inline'` | Next2D が動的にスタイルを挿入するため `'unsafe-inline'` が必須 |
+| `connect-src` | `'self' https://{{ドメイン}}` | API・コンテンツエンドポイントへの通信を許可 |
+| `worker-src` | `'self' blob: data:` | Web Worker を Blob/Data URI で生成するため |
+
+### 使用禁止の設定
+
+```
+# NG: frame-ancestors を設定するとエラーになる
+frame-ancestors 'none';   # ← 追加してはいけない
+```
+
+`frame-ancestors 'none'` を追加するとアプリケーションがエラーになる。設定しないこと。
+
+### Vite での設定例 (vite.config.ts)
+
+```typescript
+import { defineConfig } from "vite";
+
+export default defineConfig({
+    server: {
+        headers: {
+            "Content-Security-Policy": [
+                "default-src 'self' data: blob:",
+                "script-src 'self'",
+                "style-src 'self' 'unsafe-inline'",
+                "connect-src 'self' https://example.com",
+                "worker-src 'self' blob: data:"
+            ].join("; ")
+        }
+    }
+});
+```
+
+### nginx での設定例
+
+```nginx
+add_header Content-Security-Policy "default-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://example.com; worker-src 'self' blob: data:";
+```
+
+### Anti-Patterns
+
+```
+# NG: frame-ancestors を追加する
+Content-Security-Policy: default-src 'self' data: blob:; ... frame-ancestors 'none';
+
+# NG: worker-src に blob: を含めない → Web Worker が動作しない
+worker-src 'self';
+
+# NG: default-src に blob: を含めない → Player の内部処理が失敗する
+default-src 'self';
+
+# NG: style-src に 'unsafe-inline' を含めない → スタイルが適用されない
+style-src 'self';
+```
+
 ## Anti-Patterns
 
 ```typescript
