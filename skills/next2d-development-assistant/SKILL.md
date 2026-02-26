@@ -1,34 +1,14 @@
 ---
 name: next2d-development-assistant
 description: >
-  Next2D Player および Next2D Framework を用いたアプリケーション開発を支援するスキル。
-  TypeScript ベースの MVVM + Clean Architecture + Atomic Design パターンに従ったコード生成、
-  WebGL/WebGPU 2D レンダリングエンジン API の活用、デバッグ支援、パフォーマンス最適化を提供する。
+  Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when:
-  (1) Next2D Player の DisplayObject API (MovieClip, Sprite, Shape, TextField, Video, Sound, Tween, Filters) を使ったコードを書く
-  (2) Next2D Framework の MVVM パターン (View/ViewModel, UseCase, Repository) に従った画面実装
-  (3) routing.json, config.json, stage.json の設定
-  (4) Atomic Design (Atom/Molecule/Organism/Page) による UI コンポーネント設計
-  (5) Animation Tool (.n2d) アセットとの連携
-  (6) マルチプラットフォームビルド (Web/Steam/iOS/Android)
-  (7) Next2D プロジェクトの新規作成やセットアップ
-  (8) ButtonAtom の enable/disable によるボタン連打防止パターンの実装
-  (9) TextField.stopIndex と Tween を使ったタイプライター（RPG台詞）アニメーションの実装
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, @next2d/display,
-  @next2d/events, @next2d/text, @next2d/media, @next2d/ui, MovieClipContent,
-  gotoView, routing.json, stage.json, create-next2d-app,
-  ButtonAtom, enable, disable, 連打防止, ボタン無効化,
-  stopIndex, タイプライター, 台詞アニメーション, テキストアニメーション
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション
 ---
 
 # Next2D Development Assistant
-
-## Overview
-
-Next2D は WebGL/WebGPU ベースの 2D レンダリングエンジン (Player) と MVVM フレームワーク (Framework) で構成される。
-Flash Player ライクな DisplayList アーキテクチャを Web/デスクトップ/モバイルで実現する。
 
 ## Architecture
 
@@ -45,15 +25,6 @@ Application Layer (model/application/)
 **Design Patterns:** MVVM + Clean Architecture + Atomic Design
 **Language:** TypeScript (any 禁止, Interface は I プレフィックス)
 **Build Tool:** Vite / **Testing:** Vitest / **Package Manager:** npm
-
-## Quick Start
-
-```bash
-npx create-next2d-app my-app
-cd my-app
-npm install
-npm start           # http://localhost:5173
-```
 
 ## Core Workflow
 
@@ -82,36 +53,7 @@ npm start           # http://localhost:5173
 
 `stopIndex` で表示文字数を制御し、`Tween` でアニメーション。RPGゲームの台詞ウィンドウ演出に使用する。
 `stopIndex` のデフォルトは `-1`（全文字表示）。`0` にすると文字が非表示になる。
-
-```typescript
-const { TextField } = next2d.text;
-const { Tween, Job } = next2d.ui;
-
-const textField = new TextField();
-textField.width = 300;
-textField.height = 80;
-textField.multiline = true;
-textField.wordWrap = true;
-textField.text = "勇者よ、魔王を倒してくれ！世界の命運はそなたにかかっている。";
-
-stage.addChild(textField);
-
-// stopIndex を 0 → text.length まで 5秒かけてアニメーション（0.5秒の遅延あり）
-const job = Tween.add(
-    textField,
-    { stopIndex: 0 },
-    { stopIndex: textField.text.length },
-    0.5,
-    5
-);
-
-// 表示完了後のコールバック
-job.addEventListener(Job.COMPLETE, () => {
-    console.log("台詞表示完了");
-});
-
-job.start();
-```
+コード例は `references/player-specs.md` を参照。
 
 ## View/ViewModel Lifecycle
 
@@ -172,25 +114,3 @@ Detailed specifications are available in the `references/` directory. Read the r
 - **[framework-specs.md](references/framework-specs.md)** - Next2D Framework reference (MVVM architecture, routing, config, View/ViewModel lifecycle, Animation Tool integration). Read when working on application architecture, screen transitions, or configuration.
 - **[develop-specs.md](references/develop-specs.md)** - Development template specs (project structure, CLI commands, interfaces, Model layer, UI layer with Atomic Design, View/ViewModel patterns). Read when creating new components, setting up projects, or following coding patterns.
 
-### When to read which reference
-
-| Task | Reference |
-|------|-----------|
-| DisplayObject のプロパティ/メソッドを確認 | player-specs.md |
-| MovieClip/Sprite/Shape/TextField の使い方 | player-specs.md |
-| フィルター (Blur, DropShadow, Glow 等) の適用 | player-specs.md |
-| Tween アニメーションの実装 | player-specs.md |
-| TextField stopIndex タイプライターアニメーション | player-specs.md |
-| Sound/Video の再生 | player-specs.md |
-| イベントシステム (addEventListener 等) | player-specs.md |
-| routing.json / config.json の設定 | framework-specs.md |
-| View/ViewModel のライフサイクル | framework-specs.md |
-| 画面遷移 (gotoView) の実装 | framework-specs.md |
-| Animation Tool 連携 | framework-specs.md |
-| プロジェクト構造・ディレクトリ設計 | develop-specs.md |
-| UseCase / Repository の作成 | develop-specs.md |
-| Atomic Design コンポーネントの作成 | develop-specs.md |
-| ボタン連続押下防止パターン | develop-specs.md |
-| Interface の定義パターン | develop-specs.md |
-| テストの書き方 (Vitest) | develop-specs.md |
-| Content-Security-Policy (CSP) の設定 | develop-specs.md |
