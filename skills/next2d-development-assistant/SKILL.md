@@ -14,11 +14,13 @@ description: >
   (6) マルチプラットフォームビルド (Web/Steam/iOS/Android)
   (7) Next2D プロジェクトの新規作成やセットアップ
   (8) ButtonAtom の enable/disable によるボタン連打防止パターンの実装
+  (9) TextField.stopIndex と Tween を使ったタイプライター（RPG台詞）アニメーションの実装
 
   Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, @next2d/display,
   @next2d/events, @next2d/text, @next2d/media, @next2d/ui, MovieClipContent,
   gotoView, routing.json, stage.json, create-next2d-app,
-  ButtonAtom, enable, disable, 連打防止, ボタン無効化
+  ButtonAtom, enable, disable, 連打防止, ボタン無効化,
+  stopIndex, タイプライター, 台詞アニメーション, テキストアニメーション
 ---
 
 # Next2D Development Assistant
@@ -75,6 +77,41 @@ npm start           # http://localhost:5173
 1. Animation Tool でシンボルを作成 → `.n2d` ファイルを `file/` に配置
 2. `ui/content/` に MovieClipContent 継承クラスを作成 (`namespace` でシンボル名を指定)
 3. `routing.json` で `type: "content"` として読み込み
+
+### 4. TextField タイプライターアニメーション（stopIndex）
+
+`stopIndex` で表示文字数を制御し、`Tween` でアニメーション。RPGゲームの台詞ウィンドウ演出に使用する。
+`stopIndex` のデフォルトは `-1`（全文字表示）。`0` にすると文字が非表示になる。
+
+```typescript
+const { TextField } = next2d.text;
+const { Tween, Job } = next2d.ui;
+
+const textField = new TextField();
+textField.width = 300;
+textField.height = 80;
+textField.multiline = true;
+textField.wordWrap = true;
+textField.text = "勇者よ、魔王を倒してくれ！世界の命運はそなたにかかっている。";
+
+stage.addChild(textField);
+
+// stopIndex を 0 → text.length まで 5秒かけてアニメーション（0.5秒の遅延あり）
+const job = Tween.add(
+    textField,
+    { stopIndex: 0 },
+    { stopIndex: textField.text.length },
+    0.5,
+    5
+);
+
+// 表示完了後のコールバック
+job.addEventListener(Job.COMPLETE, () => {
+    console.log("台詞表示完了");
+});
+
+job.start();
+```
 
 ## View/ViewModel Lifecycle
 
@@ -143,6 +180,7 @@ Detailed specifications are available in the `references/` directory. Read the r
 | MovieClip/Sprite/Shape/TextField の使い方 | player-specs.md |
 | フィルター (Blur, DropShadow, Glow 等) の適用 | player-specs.md |
 | Tween アニメーションの実装 | player-specs.md |
+| TextField stopIndex タイプライターアニメーション | player-specs.md |
 | Sound/Video の再生 | player-specs.md |
 | イベントシステム (addEventListener 等) | player-specs.md |
 | routing.json / config.json の設定 | framework-specs.md |
