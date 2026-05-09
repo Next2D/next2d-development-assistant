@@ -1626,12 +1626,26 @@ style-src 'self';
 ## Anti-Patterns
 
 ```typescript
-// NG: Viewでビジネスロジック
+// NG: Viewでビジネスロジック + addEventListener に async 関数を直接渡す
+// async () => {} を渡すと Promise が返り、@next2d/player がチャンネルを保持したまま
+// SPA 遷移で閉じられ "A listener indicated an asynchronous response by returning true,
+// but the message channel closed before a response was received" エラーが発生する。
 class BadView extends View {
     async initialize() {
         btn.addEventListener(PointerEvent.POINTER_DOWN, async () => {
-            const data = await Repository.get(); // NG
-            this.processData(data);              // NG
+            const data = await Repository.get(); // NG: ビジネスロジック in View
+            this.processData(data);              // NG: ビジネスロジック in View
+        });
+    }
+}
+
+// OK: 同期ハンドラ内で void IIFE を使い Promise を捨てる
+class GoodView extends View {
+    async initialize() {
+        btn.addEventListener(PointerEvent.POINTER_DOWN, () => {  // 同期関数
+            void (async () => {
+                await this.vm.onClickButton();  // OK: VMに委譲
+            })();
         });
     }
 }

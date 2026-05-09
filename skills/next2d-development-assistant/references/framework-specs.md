@@ -1730,6 +1730,108 @@ homeContentPointerDownEvent(event: PointerEvent): void
 
 View内でイベント処理を完結させず、必ずViewModelに委譲します。
 
+### 4. `addEventListener` に `async` 関数を直接渡さない
+
+**NG パターン（Promiseエラーの原因）:**
+
+```typescript
+btn.addEventListener(PointerEvent.POINTER_DOWN, async () =>
+{
+    await this.vm.onClickSomething();
+});
+```
+
+`async` 関数は Promise を返します。@next2d/player の内部イベントシステムは、
+ハンドラが truthy な値を返すと「非同期応答あり」と解釈し、Worker との
+メッセージチャンネルを保持します。SPA 遷移で `gotoView()` が呼ばれると
+チャンネルが閉じられ、以下のエラーが `Uncaught (in promise)` として発生します。
+
+```
+A listener indicated an asynchronous response by returning true,
+but the message channel closed before a response was received
+```
+
+**OK パターン（`void (async () => {})()` でラップ）:**
+
+```typescript
+btn.addEventListener(PointerEvent.POINTER_DOWN, () =>
+{
+    if (!btn.enabled) { return; }        // 同期ガードはここで
+    btn.disable();
+
+    void (async () =>
+    {
+        try {
+            await this.vm.onClickSomething();
+        } catch (error) {
+            btn.enable();
+            console.error("[prefix]", "遷移に失敗", error);
+        }
+    })();
+});
+```
+
+ポイント:
+- 外側のハンドラを **同期関数** にして `void` 以外の戻り値を返さない
+- `await` が必要な処理は内側の即時実行 async IIFE に閉じ込め、`void` で破棄
+- `enabled` チェックなど即時判断が必要なガードは **外側の同期ハンドラ** に置く
+
+### 5. SPA 遷移時の「メッセージチャンネルクローズ」エラーを防ぐ
+
+**エラーメッセージ:**
+```
+Uncaught (in promise) Error: A listener indicated an asynchronous response
+by returning true, but the message channel closed before a response was received
+```
+
+**発生メカニズム（2つの独立した原因）:**
+
+| # | 原因 | 性質 | 対処 |
+|---|------|------|------|
+| ① | `addEventListener` に `async` 関数を直接渡した（Promise を返すため） | JavaScript Promise rejection | 設計原則4の `void (async () => {})()` パターンで修正 |
+| ② | @next2d/player が `app.initialize()` 完了後に DOM 追加する IME 用 `<textarea tabindex="-1">` を Chrome 拡張機能（パスワードマネージャー等）が検出し、SPA 遷移でチャンネルが閉じる | **Chrome 拡張機能のランタイムエラー**（JS Promise rejection ではない） | 初期化後に textarea へ `autocomplete="off"` 等を設定して拡張機能の検出を抑制 |
+
+> **重要:** 原因②は JavaScript の Promise rejection ではなく Chrome 拡張機能のランタイムエラーです。
+> そのため `window.addEventListener("unhandledrejection", ...)` では**捕捉・抑制できません**。
+> `unhandledrejection` ハンドラは原因①（コード起因）の残存ケースに対する安全網として追加します。
+
+**アプリエントリポイント (`index.ts`) への対処:**
+
+```typescript
+// ① コード起因の Promise rejection が残存する場合の安全網（unhandledrejection で捕捉可能）
+//    原因②（Chrome 拡張起因）はここでは捕捉できないため、別途 textarea 対策が必要
+window.addEventListener("unhandledrejection", (event) =>
+{
+    const reason = event.reason;
+    const message = (typeof reason === "string"
+        ? reason
+        : (reason as { message?: string } | null)?.message) ?? "";
+    if (message.includes("A listener indicated an asynchronous response by returning true")) {
+        event.preventDefault();
+    }
+});
+
+const boot = async (): Promise<void> =>
+{
+    await app.initialize(config, packages).run();
+
+    // ② @next2d/player の IME 用グローバル textarea に Chrome 拡張が干渉するのを防ぐ
+    //    tabIndex="-1" の textarea は @next2d/player が app.initialize() 完了時に DOM 追加する
+    //    Chrome の自動補完やパスワードマネージャーがこの textarea を検出すると
+    //    SPA 遷移時にメッセージチャンネルエラーが発生する（JS Promise rejection ではなく
+    //    Chrome 拡張のランタイムエラーのため unhandledrejection ハンドラでは捕捉不可）
+    const internalTextarea = document.querySelector('textarea[tabindex="-1"]');
+    if (internalTextarea) {
+        internalTextarea.setAttribute("autocomplete", "off");
+        internalTextarea.setAttribute("data-form-type", "other");
+        internalTextarea.setAttribute("role", "presentation");
+        internalTextarea.setAttribute("aria-hidden", "true");
+    }
+
+    await app.gotoView();
+};
+```
+
 ## View/ViewModel作成のテンプレート
 
 ### View
