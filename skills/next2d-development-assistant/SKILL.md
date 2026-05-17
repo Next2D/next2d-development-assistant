@@ -26,6 +26,18 @@ Application Layer (model/application/)
 **Language:** TypeScript (any 禁止, Interface は I プレフィックス)
 **Build Tool:** Vite / **Testing:** Vitest / **Package Manager:** npm
 
+## Initial Setup
+
+新規プロジェクトを作成する場合は以下のコマンドを実行する。**TypeScript テンプレートを推奨する：**
+
+```bash
+# 推奨: TypeScript
+npx create-next2d-app {{PROJECT-NAME}} --template @next2d/framework-typescript-template
+
+# JavaScript (非推奨)
+npx create-next2d-app {{PROJECT-NAME}} --template @next2d/framework-javascript-template
+```
+
 ## Core Workflow
 
 ### 1. 新しい画面を追加する
