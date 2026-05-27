@@ -3,9 +3,9 @@ name: next2d-development-assistant
 description: >
   Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数
 ---
 
 # Next2D Development Assistant

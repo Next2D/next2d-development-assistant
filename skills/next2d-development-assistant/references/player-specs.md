@@ -579,6 +579,80 @@ displayObject.dispatchEvent(event);
 | `stopPropagation()` | 伝播を停止 |
 | `stopImmediatePropagation()` | 伝播を即座に停止 |
 
+## イベント定数の使用
+
+イベントを `addEventListener` で登録する際は、文字列リテラルではなく必ず定数を使用する。
+
+```typescript
+// NG: 文字列リテラル
+sprite.addEventListener("pointerup", handler);
+
+// OK: 定数を使用
+sprite.addEventListener(PointerEvent.POINTER_UP, handler);
+```
+
+**理由:** 定数を使用することで、タイプミスの防止、IDEによる補完・型チェック、リファクタリング時の安全性が得られる。
+
+### 全イベント定数一覧
+
+| クラス | 定数 | 文字列値 | 説明 |
+|--------|------|----------|------|
+| `PointerEvent` | `POINTER_DOWN` | `"pointerdown"` | ポインター押下 |
+| `PointerEvent` | `POINTER_UP` | `"pointerup"` | ポインター解放 |
+| `PointerEvent` | `POINTER_MOVE` | `"pointermove"` | ポインター移動 |
+| `PointerEvent` | `POINTER_OVER` | `"pointerover"` | ポインター進入 |
+| `PointerEvent` | `POINTER_OUT` | `"pointerout"` | ポインター退出 |
+| `PointerEvent` | `POINTER_LEAVE` | `"pointerleave"` | ポインター離脱 |
+| `PointerEvent` | `POINTER_CANCEL` | `"pointercancel"` | ポインターキャンセル |
+| `PointerEvent` | `DOUBLE_CLICK` | `"dblclick"` | ダブルクリック |
+| `KeyboardEvent` | `KEY_DOWN` | `"keydown"` | キー押下 |
+| `KeyboardEvent` | `KEY_UP` | `"keyup"` | キー解放 |
+| `FocusEvent` | `FOCUS_IN` | `"focusin"` | フォーカス取得 |
+| `FocusEvent` | `FOCUS_OUT` | `"focusout"` | フォーカス喪失 |
+| `WheelEvent` | `WHEEL` | `"wheel"` | ホイール操作 |
+| `VideoEvent` | `PLAY` | `"play"` | 再生リクエスト |
+| `VideoEvent` | `PLAYING` | `"playing"` | 再生開始 |
+| `VideoEvent` | `PAUSE` | `"pause"` | 一時停止 |
+| `VideoEvent` | `SEEK` | `"seek"` | シーク操作 |
+| `JobEvent` | `UPDATE` | `"update"` | プロパティ更新 |
+| `JobEvent` | `STOP` | `"stop"` | ジョブ停止 |
+| `Event` | `COMPLETE` | `"complete"` | 処理完了（Tween/Loader） |
+| `Event` | `ENTER_FRAME` | `"enterframe"` | 毎フレーム |
+| `Event` | `ADDED` | `"added"` | コンテナに追加 |
+| `Event` | `ADDED_TO_STAGE` | `"addedtostage"` | Stageに追加 |
+| `Event` | `REMOVED` | `"removed"` | コンテナから削除 |
+| `Event` | `REMOVED_FROM_STAGE` | `"removedfromstage"` | Stageから削除 |
+| `Event` | `IO_ERROR` | `"ioerror"` | IOエラー |
+| `Event` | `HTTP_STATUS` | `"httpstatus"` | HTTPステータス受信 |
+
+### 使用例
+
+```typescript
+import { PointerEvent, KeyboardEvent, Event } from "@next2d/events";
+
+// ポインターイベント
+button.addEventListener(PointerEvent.POINTER_DOWN, onPointerDown);
+button.addEventListener(PointerEvent.POINTER_UP,   onPointerUp);
+
+// キーボードイベント
+stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+
+// タイムラインイベント
+movieClip.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+```
+
+### 定数がないイベント
+
+一部のイベント（表示リスト、タイムライン、ロード関連など）は `Event` クラスの文字列リテラルを使用する。これらは定数として提供されていない。
+
+```typescript
+import { Event } from "@next2d/events";
+
+// 文字列リテラルを使用（定数なし）
+sprite.addEventListener(Event.ADDED_TO_STAGE, onAdded);
+movieClip.addEventListener(Event.ENTER_FRAME, onFrame);
+```
+
 ## 標準イベントタイプ
 
 ### 表示リスト関連
