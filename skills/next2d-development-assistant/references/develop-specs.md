@@ -1286,6 +1286,94 @@ export class TopBtnMolecule extends ButtonAtom {
 }
 ```
 
+### DisplayObject の中心点基準配置（scale・rotation アニメーション必須）
+
+`scaleX` / `scaleY` / `rotation` を変更すると `width` / `height` の値が変わる。
+**addChild より前にスケール・回転を確定させないと、オフセット計算がずれる。**
+
+実装手順（順序厳守）:
+
+```typescript
+// ステップ a: scaleX / scaleY / rotation を先に設定（width/height を確定させる）
+child.scaleX  = 2;
+child.scaleY  = 2;
+child.rotation = 45;
+
+// ステップ b: 確定した width/height でオフセットを計算し、原点を中心に移動
+child.x = -child.width  / 2;
+child.y = -child.height / 2;
+
+// ステップ c: 親 Sprite に addChild（この時点で中心点基準の配置が完成）
+sprite.addChild(child);
+```
+
+#### Tween で中心点基準のスケールアニメーションを行う場合
+
+```typescript
+export class YourScaleAnimation
+{
+    private readonly _job: Job;
+
+    constructor (sprite: Sprite, child: Sprite, callback?: () => void)
+    {
+        // ステップ a: 初期スケールを設定して width/height を確定
+        child.scaleX = 0;
+        child.scaleY = 0;
+
+        // ステップ b: 中心点オフセットを計算
+        //   scaleX=0 のとき width=0 になるため、最終サイズで計算する
+        //   → scaleX=1 にした上で取得し、その後に戻す
+        child.scaleX = 1;
+        child.scaleY = 1;
+        child.x = -child.width  / 2;
+        child.y = -child.height / 2;
+        child.scaleX = 0;
+        child.scaleY = 0;
+
+        // ステップ c: addChild してから Tween を設定
+        sprite.addChild(child);
+
+        this._job = Tween.add(child,
+            { "scaleX": 0, "scaleY": 0 },
+            { "scaleX": 1, "scaleY": 1 },
+            0.3, 0, Easing.outBack
+        );
+
+        if (callback) {
+            this._job.addEventListener(Event.COMPLETE, callback);
+        }
+    }
+
+    start (): void
+    {
+        this._job.start();
+    }
+}
+```
+
+#### Anti-Patterns
+
+```typescript
+// NG: addChild 後にスケールを変更 → width/height が変わりオフセットがずれる
+sprite.addChild(child);
+child.scaleX = 2;
+child.scaleY = 2;
+child.x = -child.width / 2; // この時点の width は scaleX=2 適用後なので正しいが、
+                              // addChild 済みなので描画順が保証されない
+
+// NG: スケール設定前にオフセットを計算 → width/height がデフォルト値のまま
+child.x = -child.width / 2; // scaleX 未設定の width で計算してしまう
+child.scaleX = 2;
+sprite.addChild(child);
+
+// OK: a → b → c の順序を守る
+child.scaleX = 2;           // a: スケール確定
+child.scaleY = 2;
+child.x = -child.width / 2; // b: オフセット計算
+child.y = -child.height / 2;
+sprite.addChild(child);      // c: addChild
+```
+
 ---
 
 ## Content (Animation Tool)
