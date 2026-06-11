@@ -3,9 +3,9 @@ name: next2d-development-assistant
 description: >
   Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数, namespace, constructor.name, クラス判定, instanceof, minify
 ---
 
 # Next2D Development Assistant
@@ -83,6 +83,7 @@ ViewModel 生成 → ViewModel.initialize() → View 生成 (VM注入) → View.
 - **Repository:** try-catch 必須。エンドポイントは `config` から取得。`any` 禁止
 - **UI Component:** 単一責任。データは ViewModel から引数で受け取る
 - **Interface:** `I` プレフィックス。必要最小限のプロパティのみ
+- **クラス判定:** `constructor.name` は minify でクラス名が変わるため禁止。`displayObject.namespace`（インスタンス）または `Stage.namespace`（static）の文字列比較で判定する。詳細は `references/player-specs.md` の「クラス判定（namespace）」を参照
 - **動作検証:** 画面遷移や UI 挙動の変更後は、`npx playwright` によるE2E動作確認を推奨（例: `npx playwright test`）
 - **CSP設定:** `default-src 'self' data: blob:` / `worker-src 'self' blob: data:` / `style-src 'self' 'unsafe-inline'` が必須。`frame-ancestors 'none'` は追加禁止
 

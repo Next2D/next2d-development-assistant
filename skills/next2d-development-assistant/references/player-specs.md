@@ -241,6 +241,7 @@ DisplayObjectは、Next2D Playerにおける全ての表示オブジェクトの
 | `mouseX` | number | 対象のDisplayObjectの基準点からのマウスのX座標（ピクセル） |
 | `mouseY` | number | 対象のDisplayObjectの基準点からのマウスのY座標（ピクセル） |
 | `root` | MovieClip \| Sprite \| null | DisplayObjectのルートであるDisplayObjectContainer |
+| `namespace` | string | クラスの空間名（例: `"next2d.display.Sprite"`）を返却。クラス判定に使用する（詳細は[クラス判定](#クラス判定namespace)を参照） |
 
 ### 読み書きプロパティ
 
@@ -479,6 +480,45 @@ sprite.cacheAsBitmap = null;
 - キャッシュ中は子要素の変更（追加・削除・プロパティ変更）が画面に反映されません
 - `stage.rendererScale`が変更されるとキャッシュが自動的に無効化されます
 - `filter`と`cacheAsBitmap`を同時に設定した場合、`cacheAsBitmap`が優先されます
+
+## クラス判定（namespace）
+
+クラスの種類を判定する際に `constructor.name` を使用してはいけません。プロダクションビルドでは minify によってクラス名が短縮・変更されるため、開発環境では動作してもビルド後に判定が壊れます。
+
+代わりに `namespace` プロパティを使用します。`namespace` はハードコードされた文字列（例: `"next2d.display.Stage"`）を返すため、minify の影響を受けません。インスタンスの getter と static getter の両方が用意されています。
+
+```typescript
+const { Stage, Sprite } = next2d.display;
+
+// ❌ NG: minify でクラス名が変わるため、ビルド後に判定が壊れる
+if (displayObject.constructor.name === "Stage") { /* ... */ }
+
+// ✅ OK: インスタンスの namespace で判定
+if (displayObject.namespace === "next2d.display.Stage") { /* ... */ }
+
+// ✅ OK: static の namespace と比較するとタイポも防げる
+if (displayObject.namespace === Stage.namespace) { /* ... */ }
+
+// ✅ OK: Sprite かどうかの判定
+if (displayObject.namespace === Sprite.namespace) { /* ... */ }
+
+// ✅ OK: Stage 判定は isStage フラグも使用可能（Stage のみが持つ readonly プロパティ）
+if (displayObject.isStage) { /* ... */ }
+```
+
+**namespace を持つ主なクラス:**
+
+| クラス | namespace の値 |
+|--------|----------------|
+| `Stage` | `"next2d.display.Stage"` |
+| `Sprite` | `"next2d.display.Sprite"` |
+| `MovieClip` | `"next2d.display.MovieClip"` |
+| `Shape` | `"next2d.display.Shape"` |
+| `Loader` | `"next2d.display.Loader"` |
+| `TextField` | `"next2d.display.TextField"` |
+| `Video` | `"next2d.media.Video"` |
+
+**補足:** 継承を含めた機能判定（「Sprite の機能を持っているか」など）には `isStage` / `isSprite` / `isShape` / `isText` / `isVideo` / `isContainerEnabled` / `isTimelineEnabled` の各フラグを使用します。`namespace` は完全一致のクラス判定に使用します。
 
 ## 関連項目
 
