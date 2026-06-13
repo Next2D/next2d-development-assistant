@@ -3,9 +3,9 @@ name: next2d-development-assistant
 description: >
   Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定、Sprite中心点設計、親Sprite0,0中心、アニメーション基点、rotation/scale中心軸
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数, namespace, constructor.name, クラス判定, instanceof, minify
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数, namespace, constructor.name, クラス判定, instanceof, minify, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心
 ---
 
 # Next2D Development Assistant

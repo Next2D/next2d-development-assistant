@@ -1286,6 +1286,69 @@ export class TopBtnMolecule extends ButtonAtom {
 }
 ```
 
+### 親 Sprite コンテナの 0,0 中心設計（アニメーション推奨パターン）
+
+アニメーション用の親 Sprite コンテナは、**0,0 を視覚的コンテンツの中心点に設計する**のが推奨。  
+`rotation` / `scaleX` / `scaleY` はすべて 0,0 を軸に動くため、0,0 が左上だと回転・拡縮が視覚的にズレる。
+
+```
+        0,0（中心点）
+           |
+     ------+------
+    |             |
+    |   content   |
+    |             |
+     -------------
+  (-w/2, -h/2)   (w/2, -h/2)
+```
+
+#### NG: 0,0 が左上になるパターン（頻出バグ）
+
+```typescript
+// NG: container の 0,0 が左上 → rotation/scale が左上を基点に動く
+const container = new Sprite();
+container.x = stageWidth / 2 - contentWidth / 2; // 左上基準で中央に配置しようとする
+container.y = stageHeight / 2 - contentHeight / 2;
+
+const child = new YourContent();
+container.addChild(child); // child の左上が container の 0,0 に来る
+// → rotation アニメーションが左上を軸に回転してしまう
+```
+
+#### OK: 0,0 が中心点になるパターン（推奨）
+
+```typescript
+// OK: container の 0,0 = 視覚的中心点 → rotation/scale が中心を基点に動く
+const container = new Sprite();
+container.x = stageWidth / 2;  // 中心座標を設定
+container.y = stageHeight / 2;
+
+const child = new YourContent();
+// child のサイズ確定後にオフセットを計算
+child.x = -child.width  / 2;
+child.y = -child.height / 2;
+container.addChild(child);
+// → rotation / scaleX / scaleY アニメーションが中心を基点に自然に動く
+```
+
+複数の子オブジェクトを持つ場合も同様に、全ての child を中心基準でオフセット配置する：
+
+```typescript
+const container = new Sprite();
+container.x = stageWidth / 2;
+container.y = stageHeight / 2;
+
+for (const item of items) {
+    const child = new ItemAtom(item);
+    // 各 child も中心基準でオフセット
+    child.x = -child.width  / 2;
+    child.y = -child.height / 2 + indexOffset; // 縦並びなどのレイアウト調整
+    container.addChild(child);
+}
+```
+
+---
+
 ### DisplayObject の中心点基準配置（scale・rotation アニメーション必須）
 
 `scaleX` / `scaleY` / `rotation` を変更すると `width` / `height` の値が変わる。
