@@ -3,9 +3,9 @@ name: next2d-development-assistant
 description: >
   Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定、Sprite中心点設計、親Sprite0,0中心、アニメーション基点、rotation/scale中心軸
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定、Sprite中心点設計、親Sprite0,0中心、アニメーション基点、rotation/scale中心軸、Shapeキャッシュ、graphicsパスキャッシュ、cacheAsBitmap最適化
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数, namespace, constructor.name, クラス判定, instanceof, minify, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, addEventListener, イベント定数, namespace, constructor.name, クラス判定, instanceof, minify, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心, Shapeキャッシュ, graphicsキャッシュ, パスキャッシュ, cacheAsBitmap, 描画負荷, GPU負荷, 描画最適化
 ---
 
 # Next2D Development Assistant
@@ -123,7 +123,17 @@ Environment options: `--env local|dev|stg|prd`
 
 Detailed specifications are available in the `references/` directory. Read the relevant file based on the user's needs:
 
-- **[player-specs.md](references/player-specs.md)** - Next2D Player API reference (DisplayObject, MovieClip, Sprite, Shape, TextField, Video, Sound, Tween, Events, Filters). Read when implementing rendering, animation, graphics, or interaction logic.
+### Next2D Player API（用途別に分割）
+
+- **[player-overview.md](references/player-overview.md)** - Next2D Player概要・レンダリングパイプライン・DisplayListアーキテクチャ・基本的な使い方。Read when: Player全体の仕組みやアーキテクチャを理解したいとき、初期セットアップ。
+- **[player-display-objects.md](references/player-display-objects.md)** - DisplayObject / Sprite / MovieClip / Shape / Graphics APIリファレンス。Read when: 表示オブジェクトのプロパティ・メソッド、ベクター描画（graphics）、cacheAsBitmap、namespace・クラス判定、Shapeキャッシュ最適化。
+- **[player-events.md](references/player-events.md)** - EventDispatcher / PointerEvent / KeyboardEvent / FocusEvent / WheelEvent / VideoEvent / JobEvent / カスタムイベント。Read when: イベントリスナー登録・削除、イベント定数の使用、タッチ/マウス/キー入力処理。
+- **[player-media-text.md](references/player-media-text.md)** - TextField / TextFormat / Sound / SoundMixer / Video。Read when: テキスト表示・入力・stopIndexタイプライター、BGM・効果音再生、動画再生。
+- **[player-tween.md](references/player-tween.md)** - Tween / Job / Easing（32種類のイージング関数）。Read when: プログラムによるアニメーション、プロパティの滑らかな変化、chain連結、遅延アニメーション。
+- **[player-filters.md](references/player-filters.md)** - BlurFilter / DropShadowFilter / GlowFilter / BevelFilter / ColorMatrixFilter / ConvolutionFilter / DisplacementMapFilter / GradientBevelFilter / GradientGlowFilter。Read when: フィルター効果の適用、グロー・影・ぼかし実装。
+
+### Next2D Framework / 開発仕様
+
 - **[framework-specs.md](references/framework-specs.md)** - Next2D Framework reference (MVVM architecture, routing, config, View/ViewModel lifecycle, Animation Tool integration). Read when working on application architecture, screen transitions, or configuration.
 - **[develop-specs.md](references/develop-specs.md)** - Development template specs (project structure, CLI commands, interfaces, Model layer, UI layer with Atomic Design, View/ViewModel patterns). Read when creating new components, setting up projects, or following coding patterns.
 
