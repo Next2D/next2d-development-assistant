@@ -131,6 +131,13 @@ Detailed specifications are available in the `references/` directory. Read the r
 - **[player-media-text.md](references/player-media-text.md)** - TextField / TextFormat / Sound / SoundMixer / Video。Read when: テキスト表示・入力・stopIndexタイプライター、BGM・効果音再生、動画再生。
 - **[player-tween.md](references/player-tween.md)** - Tween / Job / Easing（32種類のイージング関数）。Read when: プログラムによるアニメーション、プロパティの滑らかな変化、chain連結、遅延アニメーション。
 - **[player-filters.md](references/player-filters.md)** - BlurFilter / DropShadowFilter / GlowFilter / BevelFilter / ColorMatrixFilter / ConvolutionFilter / DisplacementMapFilter / GradientBevelFilter / GradientGlowFilter。Read when: フィルター効果の適用、グロー・影・ぼかし実装。
+- **[player-sprite.md](references/player-sprite.md)** - Sprite - SpriteはDisplayObjectContainerです。MovieClipの基底クラスであり、タイムラインを持たない動的なオブジェクト管理に使用します。
+- **[player-display-object.md](references/player-display-object.md)** - DisplayObject - DisplayObjectは、Next2D Playerにおける全ての表示オブジェクトの基底クラスです。
+- **[player-movie-clip.md](references/player-movie-clip.md)** - MovieClip - MovieClipは、タイムラインアニメーションを持つDisplayObjectContainerです。Open Animation Toolで作成したアニメーションはMovieClipとして再生されます。
+- **[player-shape.md](references/player-shape.md)** - Shape - Shapeは、ベクターグラフィックスの描画専用クラスです。Spriteと異なり子オブジェクトを持てませんが、軽量でパフォーマンスに優れています。
+- **[player-text-field.md](references/player-text-field.md)** - TextField - TextFieldは、テキストの表示と編集を行うDisplayObjectです。ラベル表示から入力フォームまで、テキスト関連の機能を提供します。
+- **[player-video.md](references/player-video.md)** - Video - Videoは、動画コンテンツを再生するためのDisplayObjectです。WebM、MP4などの動画フォーマットに対応しています。
+- **[player-sound.md](references/player-sound.md)** - サウンド - Next2D Playerは、ゲームやアプリケーションで必要な音声機能を提供します。BGM、効果音、ボイスなど様々な用途に対応しています。
 
 ### Next2D Framework / 開発仕様
 
