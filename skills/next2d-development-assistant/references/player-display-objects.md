@@ -498,12 +498,43 @@ g.endFill();
 stage.addChildAt(shape, 0);
 ```
 
+### Imageの読み込み（推奨）
+
+Shapeで画像（ビットマップ）を使う場合の推奨API:
+
+| 用途 | 推奨API | 備考 |
+|------|---------|------|
+| 単一の画像を読み込む | `shape.load(url)` | 指定されたURLから画像を非同期で読み込み、Graphicsを生成する |
+| 画像の繰り返し描画（タイル） | `graphics.beginBitmapFill(bitmapData, matrix?, repeat?, smooth?)` | `repeat: true` でタイル状に繰り返し描画 |
+| 画像の塗りつぶし | `graphics.beginBitmapFill(bitmapData, ...)` | 矩形・円などの図形をビットマップで塗りつぶす |
+
+- **ShapeでImageを読み込むときは `load()` を推奨**する
+- **Imageを繰り返し描画したり塗りつぶしに使うときは `beginBitmapFill` を利用**する
+
+```typescript
+const { Shape } = next2d.display;
+
+// Shapeのload()メソッドで画像を読み込み（単一画像はload推奨）
+const textureShape = new Shape();
+await textureShape.load("texture.png");
+
+// 繰り返し描画・塗りつぶしにはbeginBitmapFillを利用
+const shape = new Shape();
+const g = shape.graphics;
+g.beginBitmapFill(textureShape.bitmapData, null, true, true);
+g.drawRect(0, 0, 400, 300);
+g.endFill();
+
+stage.addChild(shape);
+```
+
 ## パフォーマンスのヒント
 
 1. **静的な描画にはShapeを使用**: インタラクションが不要な背景や装飾にはShapeが最適
 2. **描画の最小化**: 頻繁に変更されない場合は一度だけ描画
 3. **clear()の使用**: 動的な再描画時は必ずclear()を呼ぶ
 4. **複雑な図形はキャッシュ**: cacheAsBitmapプロパティで描画をキャッシュ
+5. **Imageの読み込み**: 単一画像は `load()`、繰り返し描画・塗りつぶしは `beginBitmapFill` を利用
 
 ```typescript
 const { Matrix } = next2d.geom;

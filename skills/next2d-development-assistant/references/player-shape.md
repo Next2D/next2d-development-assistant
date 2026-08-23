@@ -43,6 +43,21 @@ classDiagram
 | パフォーマンス | 軽量 | やや重い |
 | 用途 | 静的な背景、装飾 | ボタン、コンテナ |
 
+## Imageの読み込み（推奨）
+
+Shapeで画像（ビットマップ）を使う場合の推奨API:
+
+| 用途 | 推奨API | 備考 |
+|------|---------|------|
+| 単一の画像を読み込む | `shape.load(url)` | 指定されたURLから画像を非同期で読み込み、Graphicsを生成する |
+| 画像の繰り返し描画（タイル） | `graphics.beginBitmapFill(bitmapData, matrix?, repeat?, smooth?)` | `repeat: true` でタイル状に繰り返し描画 |
+| 画像の塗りつぶし | `graphics.beginBitmapFill(bitmapData, ...)` | 矩形・円などの図形をビットマップで塗りつぶす |
+
+- **ShapeでImageを読み込むときは `load()` を推奨**する
+- **Imageを繰り返し描画したり塗りつぶしに使うときは `beginBitmapFill` を利用**する
+
+使用例は「[ビットマップ塗りつぶし](#ビットマップ塗りつぶし)」を参照。
+
 ## 使用例
 
 ### 基本的な描画
@@ -228,6 +243,7 @@ stage.addChild(frontShape);
 2. **描画の最小化**: 頻繁に変更されない場合は一度だけ描画
 3. **clear()の使用**: 動的な再描画時は必ずclear()を呼ぶ
 4. **複雑な図形はキャッシュ**: cacheAsBitmapプロパティで描画をキャッシュ
+5. **Imageの読み込み**: 単一画像は `load()`、繰り返し描画・塗りつぶしは `beginBitmapFill` を利用
 
 ```typescript
 // 複雑な図形をビットマップとしてキャッシュ
