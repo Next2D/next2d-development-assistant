@@ -3,9 +3,9 @@ name: next2d-development-assistant
 description: >
   Next2D Player/Framework 開発支援。MVVM+CleanArch+AtomicDesign、WebGL/WebGPU API活用。
 
-  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定、Sprite中心点設計、親Sprite0,0中心、アニメーション基点、rotation/scale中心軸、Shapeキャッシュ、graphicsパスキャッシュ、cacheAsBitmap最適化
+  Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage設定、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、namespaceクラス判定、Sprite中心点・アニメーション基点、Shapeキャッシュ・cacheAsBitmap最適化
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, GamepadEvent, addEventListener, イベント定数, ゲームパッド, gamepad, コントローラー, ボタン入力, スティック, 軸入力, namespace, constructor.name, クラス判定, instanceof, minify, beginBitmapFill, ビットマップ塗りつぶし, 画像タイル, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心, Shapeキャッシュ, graphicsキャッシュ, パスキャッシュ, cacheAsBitmap, 描画負荷, GPU負荷, 描画最適化
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, config.json, scaleMode, align, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, GamepadEvent, addEventListener, イベント定数, ゲームパッド, gamepad, コントローラー, ボタン入力, スティック, 軸入力, namespace, constructor.name, クラス判定, instanceof, minify, beginBitmapFill, ビットマップ塗りつぶし, 画像タイル, Shapeキャッシュ, graphicsキャッシュ, パスキャッシュ, cacheAsBitmap, 描画負荷, GPU負荷, 描画最適化, Sprite中心点, 0,0中心, 回転基点, スケール基点, アニメーション基点
 ---
 
 # Next2D Development Assistant
@@ -40,6 +40,8 @@ npx create-next2d-app {{PROJECT-NAME}} --template @next2d/framework-javascript-t
 
 ## Core Workflow
 
+MCP ツールが利用可能なら（next2d-development-mcp）、雛形生成は `create_view` / `add_route` / `create_usecase` / `create_repository` / `create_ui_component` 等を優先し、変更後は `validate_architecture` で検証する。
+
 ### 1. 新しい画面を追加する
 
 1. `src/config/routing.json` にルートを追加
@@ -66,6 +68,13 @@ npx create-next2d-app {{PROJECT-NAME}} --template @next2d/framework-javascript-t
 `stopIndex` で表示文字数を制御し、`Tween` でアニメーション。RPGゲームの台詞ウィンドウ演出に使用する。
 `stopIndex` のデフォルトは `-1`（全文字表示）。`0` にすると文字が非表示になる。
 コード例は `references/player-text-field.md` の「RPGゲーム風台詞アニメーション（stopIndex）」を参照。
+
+### 5. 設定ファイルを変更する（src/config/）
+
+1. **stage.json**: ホワイトリストのみ設定可能（Key Rules 参照）。**ホワイトリスト外のキー（`scaleMode`・`align` 等）は追加しない**
+2. **config.json**: 環境依存設定は `local`/`dev`/`stg`/`prd` 環境ブロックへ、全環境共通は `all` へ
+3. **カスタム表示挙動**（scaleMode / align 等）: `config.json` にユーザ定義設定として書いて**コード側で実装**する（フレームワークは自動処理しない）
+4. 変更後は MCP `validate_architecture`（stage.json の無効キーを検出）で検証
 
 ## View/ViewModel Lifecycle
 
@@ -122,8 +131,8 @@ Environment options: `--env local|dev|stg|prd`
 
 ## References
 
-Detailed specifications are available in the `references/` directory.
-**Load only the single file needed for the current task.**
+詳細仕様は `references/` ディレクトリにある。
+**Load only the single file needed for the current task.**（タスクに必要なファイルだけ1つ読む）
 MCP を利用する場合は `next2d://specs`（索引）を読み、URI を1つ選んで読む。
 
 - **クイック**: 実装パターン・落とし穴 → まず「クイックリファレンス」
