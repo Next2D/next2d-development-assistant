@@ -5,7 +5,7 @@ description: >
 
   Use when: DisplayObject API、MVVM(View/VM/UseCase/Repository)、routing/config/stage、AtomicDesign、AnimationTool、マルチプラットフォームビルド、ButtonAtom連打防止、stopIndexタイプライター、イベント定数、namespaceクラス判定、Sprite中心点設計、親Sprite0,0中心、アニメーション基点、rotation/scale中心軸、Shapeキャッシュ、graphicsパスキャッシュ、cacheAsBitmap最適化
 
-  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, GamepadEvent, addEventListener, イベント定数, ゲームパッド, gamepad, コントローラー, ボタン入力, スティック, 軸入力, namespace, constructor.name, クラス判定, instanceof, minify, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心, Shapeキャッシュ, graphicsキャッシュ, パスキャッシュ, cacheAsBitmap, 描画負荷, GPU負荷, 描画最適化
+  Trigger keywords: Next2D, next2d, @next2d/player, @next2d/framework, gotoView, routing.json, stage.json, ButtonAtom, 連打防止, stopIndex, タイプライター, テキストアニメーション, イベント, PointerEvent, KeyboardEvent, GamepadEvent, addEventListener, イベント定数, ゲームパッド, gamepad, コントローラー, ボタン入力, スティック, 軸入力, namespace, constructor.name, クラス判定, instanceof, minify, beginBitmapFill, ビットマップ塗りつぶし, 画像タイル, Sprite中心点, 左上基点, 0,0中心, 原点中心, 回転基点, スケール基点, アニメーション基点, 中心基点, Sprite原点, addChild位置, rotation中心, scaleX中心, container中心, Shapeキャッシュ, graphicsキャッシュ, パスキャッシュ, cacheAsBitmap, 描画負荷, GPU負荷, 描画最適化
 ---
 
 # Next2D Development Assistant
@@ -65,7 +65,7 @@ npx create-next2d-app {{PROJECT-NAME}} --template @next2d/framework-javascript-t
 
 `stopIndex` で表示文字数を制御し、`Tween` でアニメーション。RPGゲームの台詞ウィンドウ演出に使用する。
 `stopIndex` のデフォルトは `-1`（全文字表示）。`0` にすると文字が非表示になる。
-コード例は `references/player-specs.md` を参照。
+コード例は `references/player-text-field.md` の「RPGゲーム風台詞アニメーション（stopIndex）」を参照。
 
 ## View/ViewModel Lifecycle
 
@@ -83,7 +83,8 @@ ViewModel 生成 → ViewModel.initialize() → View 生成 (VM注入) → View.
 - **Repository:** try-catch 必須。エンドポイントは `config` から取得。`any` 禁止
 - **UI Component:** 単一責任。データは ViewModel から引数で受け取る
 - **Interface:** `I` プレフィックス。必要最小限のプロパティのみ
-- **クラス判定:** `constructor.name` は minify でクラス名が変わるため禁止。`displayObject.namespace`（インスタンス）または `Stage.namespace`（static）の文字列比較で判定する。詳細は `references/player-specs.md` の「クラス判定（namespace）」を参照
+- **stage.json:** 設定できるのは `width` / `height` / `fps` / `options`（`fullScreen` / `tagId` / `bgColor`）のみ。`scaleMode`・`align`・`quality`・`wmode` 等の Flash 由来オプションは無効（Next2D は Flash Player の派生でなく、ホワイトリスト外のキーはサイレントに無視される）。画面いっぱい表示は `options.fullScreen: true`。詳細は `references/framework-specs.md` の「stage.json」を参照
+- **クラス判定:** `constructor.name` は minify でクラス名が変わるため禁止。`displayObject.namespace`（インスタンス）または `Stage.namespace`（static）の文字列比較で判定する。詳細は `references/player-display-object.md` の「クラス判定（namespace）」を参照
 - **動作検証:** 画面遷移や UI 挙動の変更後は、`npx playwright` によるE2E動作確認を推奨（例: `npx playwright test`）
 - **CSP設定:** `default-src 'self' data: blob:` / `worker-src 'self' blob: data:` / `style-src 'self' 'unsafe-inline'` が必須。`frame-ancestors 'none'` は追加禁止
 
@@ -121,26 +122,34 @@ Environment options: `--env local|dev|stg|prd`
 
 ## References
 
-Detailed specifications are available in the `references/` directory. Read the relevant file based on the user's needs:
+Detailed specifications are available in the `references/` directory.
+**Load only the single file needed for the current task.**
+MCP を利用する場合は `next2d://specs`（索引）を読み、URI を1つ選んで読む。
 
-### Next2D Player API（用途別に分割）
+- **クイック**: 実装パターン・落とし穴 → まず「クイックリファレンス」
+- **完全版**: 詳細なAPI確認が必要なときのみ「クラス別フルAPI」
 
-- **[player-overview.md](references/player-overview.md)** - Next2D Player概要・レンダリングパイプライン・DisplayListアーキテクチャ・基本的な使い方。Read when: Player全体の仕組みやアーキテクチャを理解したいとき、初期セットアップ。
-- **[player-display-objects.md](references/player-display-objects.md)** - DisplayObject / Sprite / MovieClip / Shape / Graphics APIリファレンス。Read when: 表示オブジェクトのプロパティ・メソッド、ベクター描画（graphics）、cacheAsBitmap、namespace・クラス判定、Shapeキャッシュ最適化。
-- **[player-events.md](references/player-events.md)** - EventDispatcher / PointerEvent / KeyboardEvent / GamepadEvent / FocusEvent / WheelEvent / VideoEvent / JobEvent / カスタムイベント。Read when: イベントリスナー登録・削除、イベント定数の使用、タッチ/マウス/キー入力処理、ゲームパッド（コントローラー）ボタン・スティック入力処理。
-- **[player-media-text.md](references/player-media-text.md)** - TextField / TextFormat / Sound / SoundMixer / Video。Read when: テキスト表示・入力・stopIndexタイプライター、BGM・効果音再生、動画再生。
-- **[player-tween.md](references/player-tween.md)** - Tween / Job / Easing（32種類のイージング関数）。Read when: プログラムによるアニメーション、プロパティの滑らかな変化、chain連結、遅延アニメーション。
-- **[player-filters.md](references/player-filters.md)** - BlurFilter / DropShadowFilter / GlowFilter / BevelFilter / ColorMatrixFilter / ConvolutionFilter / DisplacementMapFilter / GradientBevelFilter / GradientGlowFilter。Read when: フィルター効果の適用、グロー・影・ぼかし実装。
-- **[player-sprite.md](references/player-sprite.md)** - Sprite - SpriteはDisplayObjectContainerです。MovieClipの基底クラスであり、タイムラインを持たない動的なオブジェクト管理に使用します。
-- **[player-display-object.md](references/player-display-object.md)** - DisplayObject - DisplayObjectは、Next2D Playerにおける全ての表示オブジェクトの基底クラスです。
-- **[player-movie-clip.md](references/player-movie-clip.md)** - MovieClip - MovieClipは、タイムラインアニメーションを持つDisplayObjectContainerです。Open Animation Toolで作成したアニメーションはMovieClipとして再生されます。
-- **[player-shape.md](references/player-shape.md)** - Shape - Shapeは、ベクターグラフィックスの描画専用クラスです。Spriteと異なり子オブジェクトを持てませんが、軽量でパフォーマンスに優れています。
-- **[player-text-field.md](references/player-text-field.md)** - TextField - TextFieldは、テキストの表示と編集を行うDisplayObjectです。ラベル表示から入力フォームまで、テキスト関連の機能を提供します。
-- **[player-video.md](references/player-video.md)** - Video - Videoは、動画コンテンツを再生するためのDisplayObjectです。WebM、MP4などの動画フォーマットに対応しています。
-- **[player-sound.md](references/player-sound.md)** - サウンド - Next2D Playerは、ゲームやアプリケーションで必要な音声機能を提供します。BGM、効果音、ボイスなど様々な用途に対応しています。
+### Player - クイックリファレンス（パターン・落とし穴）
 
-### Next2D Framework / 開発仕様
+- **[player-overview.md](references/player-overview.md)** - Playerの仕組み・アーキテクチャを理解したいとき
+- **[player-display-objects.md](references/player-display-objects.md)** - クラス選び、型制約、キャッシュ・namespaceのポイント
+- **[player-events.md](references/player-events.md)** - イベントリスナー、入力処理（マウス / キー / ゲームパッド）
+- **[player-media-text.md](references/player-media-text.md)** - テキスト・音声・動画のポイント、stopIndexタイプライター
+- **[player-tween.md](references/player-tween.md)** - Tween / Job / Easing アニメーション
+- **[player-filters.md](references/player-filters.md)** - フィルター効果（グロー / 影 / ぼかしなど）
 
-- **[framework-specs.md](references/framework-specs.md)** - Next2D Framework reference (MVVM architecture, routing, config, View/ViewModel lifecycle, Animation Tool integration). Read when working on application architecture, screen transitions, or configuration.
-- **[develop-specs.md](references/develop-specs.md)** - Development template specs (project structure, CLI commands, interfaces, Model layer, UI layer with Atomic Design, View/ViewModel patterns). Read when creating new components, setting up projects, or following coding patterns.
+### Player - クラス別フルAPI
+
+- **[player-display-object.md](references/player-display-object.md)** - DisplayObject
+- **[player-sprite.md](references/player-sprite.md)** - Sprite
+- **[player-movie-clip.md](references/player-movie-clip.md)** - MovieClip
+- **[player-shape.md](references/player-shape.md)** - Shape
+- **[player-text-field.md](references/player-text-field.md)** - TextField
+- **[player-video.md](references/player-video.md)** - Video
+- **[player-sound.md](references/player-sound.md)** - Sound
+
+### Framework / 開発仕様
+
+- **[framework-specs.md](references/framework-specs.md)** - MVVMアーキテクチャ、routing / config、ライフサイクル、Animation Tool
+- **[develop-specs.md](references/develop-specs.md)** - プロジェクト構造、CLIコマンド、Interface / Model / UIパターン
 

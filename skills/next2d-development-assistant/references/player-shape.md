@@ -251,6 +251,48 @@ const { Matrix } = next2d.geom;
 shape.cacheAsBitmap = new Matrix(1, 0, 0, 1, 0, 0);
 ```
 
+### graphicsのパスキャッシュ
+
+Shapeの`graphics`は**パス情報をもとにキャッシュキーを生成**します。そのため、`new Shape()`しても同じgraphics情報（パス情報）を持つShapeはキャッシュから描画されます。
+
+```typescript
+// 同じパス情報 → キャッシュが再利用される（GPU負荷なし）
+const shape1 = new Shape();
+shape1.graphics.beginFill(0xFF0000).drawCircle(0, 0, 50).endFill();
+
+const shape2 = new Shape();
+shape2.graphics.beginFill(0xFF0000).drawCircle(0, 0, 50).endFill(); // キャッシュヒット
+```
+
+**キャッシュが有効なプロパティ変更:**
+
+色・透明度・x/y座標・回転（`alpha`, `x`, `y`, `rotation`）はキャッシュを再利用したまま変更できるため、描画負荷が非常に小さくなります。
+
+```typescript
+// これらはキャッシュを維持したまま変更可能（低負荷）
+shape.alpha = 0.5;
+shape.x = 100;
+shape.y = 200;
+shape.rotation = 45;
+```
+
+**scaleがある場合のキャッシュ戦略:**
+
+`scaleX` / `scaleY` を使用する場合は、**最終的に表示される最大サイズで`cacheAsBitmap`を設定**し、そのキャッシュをscaleで縮小表示することで描画負荷を抑えられます。
+
+```typescript
+const { Shape } = next2d.display;
+const { Matrix } = next2d.geom;
+
+const shape = new Shape();
+shape.graphics.beginFill(0x3498db).drawRect(0, 0, 100, 100).endFill();
+
+// 最大サイズ（2倍）でキャッシュしてscaleで調整
+shape.cacheAsBitmap = new Matrix(2, 0, 0, 2, 0, 0); // 2倍品質でキャッシュ
+shape.scaleX = 0.5; // キャッシュを縮小して表示（描画負荷なし）
+shape.scaleY = 0.5;
+```
+
 ## Graphics クラス
 
 Graphicsクラスは、ベクターグラフィックスを描画するための描画APIを提供します。Shape.graphicsプロパティを通じてアクセスします。

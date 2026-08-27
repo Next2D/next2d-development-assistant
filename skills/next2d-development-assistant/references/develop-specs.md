@@ -183,6 +183,11 @@ npm run preview:android -- --env prd    # Android
 | `options.tagId` | string | null | 描画先のエレメントID |
 | `options.bgColor` | string | "transparent" | 背景色 (16進数) |
 
+> [!WARNING]
+> `stage.json` で設定できるのは上記の `width`・`height`・`fps`・`options` の**み**です。
+> **Next2D Player は Flash Player の派生ではありません。** `scaleMode`・`align`・`quality`・`wmode` 等の Flash 由来オプションは存在せず、記述してもフレームワークが一切処理しません。
+> 画面いっぱいに合わせたい場合は `options.fullScreen: true` を使ってください。上記にないキーは設定ミスとして削除してください。
+
 ### Example
 
 ```json
