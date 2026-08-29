@@ -141,7 +141,6 @@ MCP を利用する場合は `next2d://specs`（索引）を読み、URI を1つ
 ### Player - クイックリファレンス（パターン・落とし穴）
 
 - **[player-overview.md](references/player-overview.md)** - Playerの仕組み・アーキテクチャを理解したいとき
-- **[player-display-objects.md](references/player-display-objects.md)** - クラス選び、型制約、キャッシュ・namespaceのポイント
 - **[player-events.md](references/player-events.md)** - イベントリスナー、入力処理（マウス / キー / ゲームパッド）
 - **[player-media-text.md](references/player-media-text.md)** - テキスト・音声・動画のポイント、stopIndexタイプライター
 - **[player-tween.md](references/player-tween.md)** - Tween / Job / Easing アニメーション
@@ -161,4 +160,4 @@ MCP を利用する場合は `next2d://specs`（索引）を読み、URI を1つ
 
 - **[framework-specs.md](references/framework-specs.md)** - MVVMアーキテクチャ、routing / config、ライフサイクル、Animation Tool
 - **[develop-specs.md](references/develop-specs.md)** - プロジェクト構造、CLIコマンド、Interface / Model / UIパターン
-
+- **[game-development.md](references/game-development.md)** - Canvasゲーム、LocalLLM分担、Vitest/Playwrightの実装・検証手順

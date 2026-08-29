@@ -234,6 +234,10 @@ stage.addEventListener(KeyboardEvent.KEY_DOWN, (event) => {
 });
 ```
 
+### KeyboardEvent の互換性確認
+
+`KeyboardEvent` に `keyCode` などのキー固有プロパティが型定義されていない Player バージョンがある。キー値を使う実装では、先に対象バージョンで型検査と実行確認をすること。利用できない場合は、`View` がブラウザの `window` の `keydown` を購読して操作を ViewModel の意味的なメソッドへ渡し、`onExit` で必ず解除する。描画更新には引き続き `stage` の `Event.ENTER_FRAME` を使う。
+
 ---
 
 # ゲームパッドイベント
